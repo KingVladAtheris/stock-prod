@@ -1,0 +1,45 @@
+.filterBar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.filterInput {
+  width: 260px;
+  padding: 7px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-family: var(--font-ui);
+  color: var(--text-1);
+  background: var(--bg);
+  outline: none;
+  transition: border-color 0.12s, background 0.12s;
+}
+.filterInput:focus {
+  border-color: var(--accent);
+  background: var(--surface);
+  box-shadow: 0 0 0 2px rgba(43,99,212,0.1);
+}
+.filterInput::placeholder { color: var(--text-4); }
+
+.filterClear {
+  font-size: 14px;
+  color: var(--text-3);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+  transition: color 0.1s;
+}
+.filterClear:hover { color: var(--neg); }
+
+.filterCount {
+  font-size: 11px;
+  color: var(--text-3);
+  margin-left: 2px;
+}

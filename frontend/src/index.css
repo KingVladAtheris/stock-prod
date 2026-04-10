@@ -1,0 +1,105 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500;600&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* ── Backgrounds ── */
+  --bg:           #F4F5F7;
+  --surface:      #FFFFFF;
+  --surface-2:    #F0F2F5;
+  --surface-3:    #E8EBF0;
+
+  /* ── Chrome (topbar/nav) ── */
+  --chrome:       #1A1D26;
+  --chrome-2:     #22273A;
+  --chrome-text:  #E8ECF4;
+  --chrome-muted: #7A84A0;
+  --chrome-dim:   #383E52;
+
+  /* ── Text ── */
+  --text-1:       #0D1117;
+  --text-2:       #2C3347;
+  --text-3:       #64728C;
+  --text-4:       #9DA8BC;
+
+  /* ── Accent (primary action, blue) ── */
+  --accent:       #2B63D4;
+  --accent-light: #EEF3FF;
+  --accent-hover: #1D50B8;
+  --accent-text:  #1A3F9B;
+  --accent-border:#B8CCF4;
+
+  /* ── Entry section (blue tint) ── */
+  --entry-bg:     #F0F5FF;
+  --entry-bg-2:   #E5EDFF;
+  --entry-border: #C0D0F0;
+  --entry-text:   #1A3A8C;
+
+  /* ── Exit section (teal tint) ── */
+  --exit-bg:      #F0FAFA;
+  --exit-bg-2:    #E0F4F4;
+  --exit-border:  #A8D8D8;
+  --exit-text:    #0A5A5A;
+
+  /* ── Positive / green ── */
+  --pos:          #0A6E3F;
+  --pos-bg:       #E8F7EF;
+  --pos-border:   #90CEB0;
+
+  /* ── Negative / red ── */
+  --neg:          #B83232;
+  --neg-bg:       #FDF0F0;
+  --neg-border:   #F0AAAA;
+
+  /* ── Ledger closed ── */
+  --ledger-bg:    #EDE8FF;
+  --ledger-text:  #5534B5;
+  --ledger-border:#B8A8F0;
+  --ledger-dark:  #2A1A6E;
+
+  /* ── Edit mode ── */
+  --edit-bg:      #FFFBF0;
+  --edit-border:  #EED870;
+
+  /* ── Borders ── */
+  --border:       #DDE1EB;
+  --border-2:     #C8CDD8;
+  --border-3:     #A4AABF;
+
+  /* ── Typography ── */
+  --font-ui:      'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono:    'IBM Plex Mono', 'Fira Code', monospace;
+
+  /* ── Radii ── */
+  --radius:    5px;
+  --radius-lg: 9px;
+  --radius-xl: 14px;
+
+  /* ── Shadows ── */
+  --shadow-sm: 0 1px 3px rgba(13,17,23,0.08), 0 1px 2px rgba(13,17,23,0.04);
+  --shadow:    0 4px 12px rgba(13,17,23,0.10), 0 2px 4px rgba(13,17,23,0.06);
+  --shadow-lg: 0 16px 40px rgba(13,17,23,0.14), 0 4px 12px rgba(13,17,23,0.08);
+}
+
+html, body, #root {
+  height: 100%;
+  font-family: var(--font-ui);
+  background: var(--bg);
+  color: var(--text-2);
+  font-size: 13px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: 'kern' 1;
+}
+
+button { font-family: var(--font-ui); cursor: pointer; border: none; background: none; }
+input, select, textarea { font-family: var(--font-ui); font-size: 13px; }
+
+/* Tabular numerals for mono elements */
+.mono, [class*="mono"] { font-feature-settings: 'tnum' 1; }
+
+/* Thin scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-3); }

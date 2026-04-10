@@ -1,0 +1,325 @@
+/* ── CompanySelect ─────────────────────────────────────────────────────── */
+
+.page { display: flex; min-height: 100vh; }
+
+/* ── Left sidebar ── */
+.left {
+  width: 280px;
+  flex-shrink: 0;
+  background: var(--chrome);
+  color: var(--chrome-text);
+  padding: 48px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  border-right: 1px solid var(--chrome-dim);
+}
+.brand { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.brandMark { color: var(--accent); font-size: 20px; }
+.brandName { font-size: 15px; font-weight: 600; letter-spacing: 0.01em; color: var(--chrome-text); }
+.tagline { font-size: 12px; color: var(--chrome-muted); line-height: 1.6; }
+
+/* ── Right content ── */
+.right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 40px;
+  background: var(--bg);
+}
+.panel { width: 100%; max-width: 600px; }
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.panelHeader h2 {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-1);
+  letter-spacing: -0.02em;
+}
+
+.btnLogout {
+  font-size: 12px; font-weight: 500; color: var(--text-3);
+  padding: 6px 12px; border: 1px solid var(--border);
+  border-radius: var(--radius); background: transparent; cursor: pointer;
+  transition: all 0.12s;
+}
+.btnLogout:hover { color: var(--neg); border-color: var(--neg-border); background: var(--neg-bg); }
+
+.btnNew {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--accent);
+  padding: 5px 14px;
+  border: 1.5px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--accent-light);
+  transition: background 0.12s, color 0.12s;
+}
+.btnNew:hover { background: var(--accent); color: #fff; }
+
+/* ── Company list ── */
+.list {
+  list-style: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--surface);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.listItem {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s;
+}
+.listItem:last-child { border-bottom: none; }
+.listItem:hover { background: var(--surface-2); }
+
+.listClickable {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  cursor: pointer;
+  padding: 11px 16px;
+  min-width: 0;
+  gap: 0;
+}
+.listMain { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.listName {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.listSub {
+  font-size: 11px;
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+}
+.listArrow {
+  color: var(--text-4);
+  font-size: 14px;
+  transition: transform 0.12s, color 0.12s;
+  margin-right: 12px;
+  margin-left: 8px;
+}
+.listClickable:hover .listArrow { transform: translateX(3px); color: var(--accent); }
+
+/* ── Closed ledger badge in list ── */
+.closedBadge {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--ledger-bg);
+  color: var(--ledger-text);
+  border: 1px solid var(--ledger-border);
+  padding: 1px 6px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+/* ── Row action buttons ── */
+.listActions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding-right: 10px;
+  flex-shrink: 0;
+}
+.iconBtn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+  font-size: 13px;
+  color: var(--text-3);
+  background: transparent;
+  border: 1px solid transparent;
+  transition: all 0.1s;
+}
+.iconBtn:hover { background: var(--surface-2); border-color: var(--border); color: var(--text-1); }
+.iconBtnDanger:hover { background: var(--neg-bg); border-color: var(--neg-border); color: var(--neg); }
+.iconBtnLedger:hover { background: var(--ledger-bg); border-color: var(--ledger-border); color: var(--ledger-text); }
+
+.empty {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-3);
+  font-size: 13px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+/* ── Modals ── */
+.modalBackdrop {
+  position: fixed; inset: 0;
+  background: rgba(15,17,23,0.55);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 200;
+  animation: fadeIn 0.12s ease;
+}
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+.modal {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 28px 32px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+  border: 1px solid var(--border);
+  animation: slideUp 0.14s ease;
+}
+@keyframes slideUp { from{transform:translateY(6px);opacity:0} to{transform:translateY(0);opacity:1} }
+
+.modalTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-1);
+  margin-bottom: 20px;
+}
+
+.label {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 5px;
+  margin-top: 14px;
+}
+.label:first-of-type { margin-top: 0; }
+
+.input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 13px;
+  color: var(--text-1);
+  background: var(--bg);
+  outline: none;
+  transition: border-color 0.12s, background 0.12s;
+}
+.input:focus { border-color: var(--accent); background: var(--surface); }
+.mono { font-family: var(--font-mono); font-feature-settings: 'tnum' 1; }
+
+/* Opening stock split */
+.stockRow { display: flex; gap: 8px; margin-top: 4px; }
+.stockField { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.stockFieldLabel {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-4);
+}
+
+/* Close ledger date picker */
+.datePickerRow { display: flex; gap: 8px; margin-top: 4px; }
+.datePart {
+  flex: 1;
+  padding: 8px 8px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-family: var(--font-ui);
+  color: var(--text-1);
+  background: var(--bg);
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.12s;
+}
+.datePart:focus { border-color: var(--accent); }
+
+.error {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--neg);
+  background: var(--neg-bg);
+  border: 1px solid var(--neg-border);
+  padding: 7px 10px;
+  border-radius: var(--radius);
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.btnCancel {
+  padding: 7px 16px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-2);
+  background: var(--surface);
+  transition: background 0.1s;
+}
+.btnCancel:hover { background: var(--surface-2); }
+
+.btnConfirm {
+  padding: 7px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: var(--radius);
+  background: var(--chrome);
+  color: var(--chrome-text);
+  border: none;
+  transition: opacity 0.12s;
+}
+.btnConfirm:hover { opacity: 0.85; }
+
+.btnDanger {
+  padding: 7px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: var(--radius);
+  background: var(--neg);
+  color: #fff;
+  border: none;
+  transition: opacity 0.12s;
+}
+.btnDanger:hover { opacity: 0.85; }
+
+.btnLedger {
+  padding: 7px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: var(--radius);
+  background: var(--ledger-dark);
+  color: #e8dfff;
+  border: none;
+  transition: opacity 0.12s;
+}
+.btnLedger:hover { opacity: 0.85; }
+
+.confirmBody {
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.6;
+  margin-bottom: 4px;
+}
+.confirmName { font-weight: 600; color: var(--text-1); }
