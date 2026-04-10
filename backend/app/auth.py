@@ -1,5 +1,6 @@
 # backend/app/auth.py
 from datetime import datetime, timedelta
+import os
 from typing import Optional
 
 from jose import JWTError, jwt
@@ -14,7 +15,9 @@ from . import models
 # ── Config ──────────────────────────────────────────────────────────────────
 # Change SECRET_KEY to a long random string in production.
 # Generate one with: python -c "import secrets; print(secrets.token_hex(32))"
-SECRET_KEY = "CHANGE_ME_TO_A_LONG_RANDOM_SECRET_IN_PRODUCTION"
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    raise RuntimeError("SECRET_KEY environment variable is not set")
 ALGORITHM  = "HS256"
 ACCESS_TOKEN_EXPIRE_HOURS = 24
 
