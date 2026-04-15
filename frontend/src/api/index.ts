@@ -1,3 +1,4 @@
+// frontend/src/api/index.ts
 import type {
   Company, CompanyCreate, Counterparty, CounterpartyCreate,
   Product, ProductCreate, InventoryItem,

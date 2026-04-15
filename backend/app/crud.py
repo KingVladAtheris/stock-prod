@@ -32,6 +32,74 @@ def _get_company(db: Session, company_id: int, user_id: int) -> models.Company:
         raise HTTPException(404, "Company not found.")
     return c
 
+# ── Opening stock seeding ──────────────────────────────────────────────────
+
+OPENING_STOCK_SELLER_NAME  = "Stoc inițial"
+OPENING_STOCK_SELLER_TAXID = "STOC-INITIAL-0000"
+OPENING_STOCK_PRODUCT_NAME = "Stoc inițial"
+
+def seed_opening_stock(
+    db: Session,
+    company: models.Company,
+    no_vat: Decimal,
+    vat: Decimal,
+    total: Decimal,
+    stock_date: date,
+):
+    """
+    Create a real transaction + item for the opening stock so it appears
+    in the day view, inventory, and is available for exits.
+    """
+    if total <= D0:
+        return  # nothing to seed
+
+    # 1. Get or create the synthetic counterparty
+    seller = get_or_create_counterparty(db, OPENING_STOCK_SELLER_NAME, OPENING_STOCK_SELLER_TAXID)
+
+    # 2. Get or create the synthetic product for this company
+    product = get_or_create_product(db, company.id, OPENING_STOCK_PRODUCT_NAME)
+
+    # 3. Create the transaction header on stock_date
+    tx = models.Transaction(
+        company_id=company.id,
+        date=stock_date,
+        seller_id=seller.id,
+        invoice_number=None,
+        register_entry_number=None,
+    )
+    db.add(tx); db.flush()
+
+    # 4. Build item fields manually (avoid divide-by-zero when no_vat==0)
+    if no_vat > D0:
+        tf  = float(1 + vat / no_vat)
+        rnt = total / Decimal(tf)
+        rv  = total - rnt
+        mu  = rnt - no_vat
+    else:
+        # all VAT, degenerate case
+        tf  = 1.0
+        rnt = total
+        rv  = D0
+        mu  = D0
+
+    ti = models.TransactionItem(
+        transaction_id=tx.id,
+        product_id=product.id,
+        purchase_no_tax=no_vat,
+        purchase_tax_amount=vat,
+        total_purchase=total,
+        tax_factor=tf,
+        total_resale=total,
+        resale_no_tax=rnt,
+        resale_vat=rv,
+        markup=mu,
+    )
+    db.add(ti); db.flush()
+
+    # 5. Adjust inventory
+    _adjust_inventory(db, company.id, product.id, rnt, rv, total)
+
+    db.commit()
 
 # ── Counterparty ───────────────────────────────────────────────────────────
 
@@ -207,7 +275,9 @@ def _enrich_exit(ex: models.Exit) -> schemas.ExitSchema:
 # ── Stock helpers ──────────────────────────────────────────────────────────
 
 def _opening(company: models.Company):
-    return (company.opening_stock_no_vat or D0, company.opening_stock_vat or D0, company.opening_stock_total or D0)
+    # Opening stock is now seeded as a real transaction on company creation.
+    # Returning zeros prevents double-counting in _stock_before().
+    return D0, D0, D0
 
 def _stock_before(db: Session, company_id: int, before_date: date, op_nv: Decimal, op_vat: Decimal, op_tot: Decimal):
     tx_dates = db.query(

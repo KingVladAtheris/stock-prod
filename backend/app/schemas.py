@@ -48,6 +48,7 @@ class CompanyCreate(BaseModel):
     opening_stock_no_vat: Decimal = Decimal(0)
     opening_stock_vat:    Decimal = Decimal(0)
     opening_stock_total:  Decimal = Decimal(0)
+    opening_stock_date:   Optional[date] = None
 
 class Company(BaseModel):
     id: int

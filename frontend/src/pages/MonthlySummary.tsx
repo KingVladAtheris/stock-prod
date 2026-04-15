@@ -1,4 +1,4 @@
-// src/pages/MonthlySummary.tsx
+// frontend/src/pages/MonthlySummary.tsx
 import { useEffect, useState } from 'react';
 import type { Company, MonthlySummaryResponse, SummaryTotalsRow } from '../types';
 import { getMonthlySummary } from '../api';

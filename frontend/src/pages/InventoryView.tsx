@@ -1,4 +1,4 @@
-// src/pages/InventoryView.tsx
+// frontend/src/pages/InventoryView.tsx
 import { useEffect, useState } from 'react';
 import type { Company, InventoryItem } from '../types';
 import { getInventory } from '../api';

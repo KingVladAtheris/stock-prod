@@ -1,4 +1,4 @@
-// src/pages/DayView.tsx
+// frontend/src/pages/DayView.tsx
 import { useEffect, useRef, useState } from 'react';
 import type {
   Company, Counterparty, Product, InventoryItem,

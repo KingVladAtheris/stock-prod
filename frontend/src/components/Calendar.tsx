@@ -1,4 +1,4 @@
-// src/components/Calendar.tsx
+// frontend/src/components/Calendar.tsx
 import { useState } from 'react';
 import type { Company } from '../types';
 import styles from './Calendar.module.css';

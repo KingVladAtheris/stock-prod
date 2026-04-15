@@ -1,4 +1,4 @@
-// src/pages/AuthPage.tsx
+// frontend/src/pages/AuthPage.tsx
 import { useState } from 'react';
 import { login, register } from '../api';
 import styles from './AuthPage.module.css';

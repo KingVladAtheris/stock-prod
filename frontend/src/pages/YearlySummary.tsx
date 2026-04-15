@@ -1,4 +1,4 @@
-// src/pages/YearlySummary.tsx
+// frontend/src/pages/YearlySummary.tsx
 import { useEffect, useState } from 'react';
 import type { Company, YearlySummaryResponse, SummaryTotalsRow } from '../types';
 import { getYearlySummary } from '../api';

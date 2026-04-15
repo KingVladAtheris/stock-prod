@@ -1,4 +1,4 @@
-// src/components/ProductSearch.tsx
+// frontend/src/components/ProductSearch.tsx
 import { useState, useRef, useEffect } from 'react';
 import type { Product } from '../types';
 import { createProduct } from '../api';

@@ -69,7 +69,23 @@ def create_company(data: schemas.CompanyCreate,
                        opening_stock_no_vat=data.opening_stock_no_vat,
                        opening_stock_vat=data.opening_stock_vat,
                        opening_stock_total=data.opening_stock_total)
-    db.add(c); db.commit(); db.refresh(c); return c
+    db.add(c); db.commit(); db.refresh(c)
+
+    # ── NEW: seed opening stock as a real transaction ──────────────────────
+    if data.opening_stock_total and data.opening_stock_total > 0:
+        from datetime import date as date_type
+        crud.seed_opening_stock(
+            db, c,
+            no_vat=data.opening_stock_no_vat,
+            vat=data.opening_stock_vat,
+            total=data.opening_stock_total,
+            stock_date=date_type.today(),
+        )
+    # ───────────────────────────────────────────────────────────────────────
+
+    return c
+
+
 
 @app.get("/companies", response_model=List[schemas.Company])
 def get_companies(db: Session = Depends(get_db), user: models.User = Depends(get_current_user)):
@@ -87,8 +103,37 @@ def update_company(cid: int, data: schemas.CompanyCreate,
         if db.query(models.Company).filter(models.Company.user_id==user.id, models.Company.tax_id==data.tax_id).first():
             raise HTTPException(409, "Tax ID already exists.")
     c.name=data.name; c.tax_id=data.tax_id; c.chamber_id=data.chamber_id
-    c.opening_stock_no_vat=data.opening_stock_no_vat; c.opening_stock_vat=data.opening_stock_vat; c.opening_stock_total=data.opening_stock_total
-    db.commit(); db.refresh(c); return c
+    c.opening_stock_no_vat=data.opening_stock_no_vat
+    c.opening_stock_vat=data.opening_stock_vat
+    c.opening_stock_total=data.opening_stock_total
+    db.commit(); db.refresh(c)
+
+    # ── NEW: replace the seeded opening-stock transaction ─────────────────
+    seller = crud.get_or_create_counterparty(
+        db, crud.OPENING_STOCK_SELLER_NAME, crud.OPENING_STOCK_SELLER_TAXID
+    )
+    old_tx = db.query(models.Transaction).filter(
+        models.Transaction.company_id == cid,
+        models.Transaction.seller_id  == seller.id,
+    ).first()
+    # Delete old opening-stock transaction items one by one (reverses inventory)
+    if old_tx:
+        for ti in list(old_tx.items):
+            crud.delete_transaction_item(db, cid, ti)
+        db.delete(old_tx); db.commit()
+
+    if data.opening_stock_total and data.opening_stock_total > 0:
+        from datetime import date as date_type
+        crud.seed_opening_stock(
+            db, c,
+            no_vat=data.opening_stock_no_vat,
+            vat=data.opening_stock_vat,
+            total=data.opening_stock_total,
+            stock_date=date_type.today(),
+        )
+    # ─────────────────────────────────────────────────────────────────────
+
+    return c
 
 @app.delete("/companies/{cid}", status_code=204)
 def delete_company(cid: int, db: Session = Depends(get_db), user: models.User = Depends(get_current_user)):

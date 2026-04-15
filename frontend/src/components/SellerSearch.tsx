@@ -1,3 +1,4 @@
+// frontend/src/components/SellerSearch.tsx
 import { useState, useRef, useEffect } from 'react';
 import type { Seller } from '../types';
 import { createSeller } from '../api';

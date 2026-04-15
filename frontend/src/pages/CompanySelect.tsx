@@ -1,4 +1,4 @@
-// src/pages/CompanySelect.tsx
+// frontend/src/pages/CompanySelect.tsx
 import { useEffect, useState } from 'react';
 import { getCompanies, createCompany, closeLedger, reopenLedger } from '../api';
 import type { Company } from '../types';
@@ -9,8 +9,11 @@ const BASE = 'http://localhost:8000';
 interface Props { onSelect: (company: Company) => void; onLogout: () => void; }
 type ModalMode = 'create' | 'edit' | 'delete' | 'close_ledger' | null;
 
-interface StockForm { no_vat: string; vat: string; total: string; }
-const emptyStock = (): StockForm => ({ no_vat: '', vat: '', total: '' });
+interface StockForm { no_vat: string; vat: string; total: string; date: string; }
+const emptyStock = (): StockForm => ({
+  no_vat: '', vat: '', total: '',
+  date: new Date().toISOString().slice(0, 10),  // today as YYYY-MM-DD
+});
 
 const MONTHS = ['Ianuarie','Februarie','Martie','Aprilie','Mai','Iunie','Iulie','August','Septembrie','Octombrie','Noiembrie','Decembrie'];
 
@@ -36,8 +39,13 @@ export default function CompanySelect({ onSelect, onLogout }: Props) {
   };
   const openEdit = (c: Company, e: React.MouseEvent) => {
     e.stopPropagation();
-    setForm({ name: c.name, tax_id: c.tax_id, chamber_id: c.chamber_id??'' });
-    setStock({ no_vat: String(c.opening_stock_no_vat), vat: String(c.opening_stock_vat), total: String(c.opening_stock_total) });
+    setForm({ name: c.name, tax_id: c.tax_id, chamber_id: c.chamber_id ?? '' });
+    setStock({
+      no_vat: String(c.opening_stock_no_vat),
+      vat: String(c.opening_stock_vat),
+      total: String(c.opening_stock_total),
+      date: new Date().toISOString().slice(0, 10),  // ← add this
+    });
     setError(''); setTarget(c); setModalMode('edit');
   };
   const openDelete = (c: Company, e: React.MouseEvent) => { e.stopPropagation(); setTarget(c); setError(''); setModalMode('delete'); };
@@ -60,6 +68,7 @@ export default function CompanySelect({ onSelect, onLogout }: Props) {
     opening_stock_no_vat: parseFloat(stock.no_vat)||0,
     opening_stock_vat:    parseFloat(stock.vat)||0,
     opening_stock_total:  parseFloat(stock.total)||0,
+    opening_stock_date:   stock.date || new Date().toISOString().slice(0, 10),
   });
 
   const handleCreate = async () => {
@@ -175,6 +184,15 @@ export default function CompanySelect({ onSelect, onLogout }: Props) {
               <div className={styles.stockField}><span className={styles.stockFieldLabel}>Fără TVA</span><input className={`${styles.input} ${styles.mono}`} type="number" min="0" step="0.01" value={stock.no_vat} onChange={e=>sf('no_vat',e.target.value)} placeholder="0.00"/></div>
               <div className={styles.stockField}><span className={styles.stockFieldLabel}>TVA</span><input className={`${styles.input} ${styles.mono}`} type="number" min="0" step="0.01" value={stock.vat} onChange={e=>sf('vat',e.target.value)} placeholder="0.00"/></div>
               <div className={styles.stockField}><span className={styles.stockFieldLabel}>Total</span><input className={`${styles.input} ${styles.mono}`} type="number" min="0" step="0.01" value={stock.total} onChange={e=>sf('total',e.target.value)} placeholder="0.00"/></div>
+              <div className={styles.stockField} style={{flex:'1 1 140px'}}>
+  <span className={styles.stockFieldLabel}>Data stoc inițial</span>
+  <input
+    className={`${styles.input} ${styles.mono}`}
+    type="date"
+    value={stock.date}
+    onChange={e => sf('date', e.target.value)}
+  />
+</div>
             </div>
             {error&&<p className={styles.error}>{error}</p>}
             <div className={styles.modalActions}>
