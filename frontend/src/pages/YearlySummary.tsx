@@ -15,9 +15,10 @@ interface Props { company: Company; year: number; onBack: () => void; }
 
 const COLS: ExportColumn[] = [
   { header: 'Lună', key: 'label', align: 'left' },
+  { header: 'Total cump.', key: 'tp', align: 'right' },
   { header: 'Intr. fără TVA', key: 'tp_nt', align: 'right' },
   { header: 'TVA intr.', key: 'tp_vat', align: 'right' },
-  { header: 'Total intr.', key: 'tp', align: 'right' },
+  { header: 'Total intr.', key: 'tresale', align: 'right' },
   { header: 'Ies. fără TVA', key: 'ex_nt', align: 'right' },
   { header: 'TVA ies.', key: 'ex_vat', align: 'right' },
   { header: 'Total ies.', key: 'ex', align: 'right' },
@@ -28,6 +29,7 @@ function TotalsRow({ label, row, prev }: { label: string; row: SummaryTotalsRow;
   return (
     <tr className={prev ? styles.prevTotalsRow : styles.periodTotalsRow}>
       <td className={`${styles.td} ${styles.totalsLabel}`}>{label}</td>
+      <td className={`${styles.td} ${styles.right} ${styles.mono} ${styles.bold}`}>{fmt(row.total_purchase)}</td>
       <td className={`${styles.td} ${styles.right} ${styles.mono}`}>{fmt(row.resale_no_tax)}</td>
       <td className={`${styles.td} ${styles.right} ${styles.mono} ${styles.muted}`}>{fmt(row.resale_vat)}</td>
       <td className={`${styles.td} ${styles.right} ${styles.mono} ${styles.bold}`}>{fmt(row.total_resale)}</td>
@@ -55,7 +57,8 @@ export default function YearlySummary({ company, year, onBack }: Props) {
 
   const exportRows: ExportRow[] = (data?.rows ?? []).map(r => ({
     label: `${MONTHS[r.month - 1]} ${r.year}`,
-    tp_nt: fmt(r.total_resale_no_tax), tp_vat: fmt(r.total_resale_vat), tp: fmt(r.total_resale),
+    tp: fmt(r.total_purchase),
+    tp_nt: fmt(r.total_resale_no_tax), tp_vat: fmt(r.total_resale_vat), tresale: fmt(r.total_resale),
     ex_nt: fmt(r.total_exit_no_vat), ex_vat: fmt(r.total_exit_vat), ex: fmt(r.total_exit),
     stock: fmt(r.stock_total),
   }));
@@ -66,6 +69,7 @@ export default function YearlySummary({ company, year, onBack }: Props) {
         {
           label: `${year - 1} (total)`,
           values: [
+            fmt(data.prev_totals.total_purchase),
             fmt(data.prev_totals.resale_no_tax),
             fmt(data.prev_totals.resale_vat),
             fmt(data.prev_totals.total_resale),
@@ -78,6 +82,7 @@ export default function YearlySummary({ company, year, onBack }: Props) {
         {
           label: `${year} (total)`,
           values: [
+            fmt(data.period_totals.total_purchase),
             fmt(data.period_totals.resale_no_tax),
             fmt(data.period_totals.resale_vat),
             fmt(data.period_totals.total_resale),
@@ -121,6 +126,7 @@ export default function YearlySummary({ company, year, onBack }: Props) {
             <thead>
               <tr>
                 <th className={`${styles.th} ${styles.left}`}>Lună</th>
+                <th className={`${styles.th} ${styles.right}`}>Total cump.</th>
                 <th className={`${styles.th} ${styles.right}`}>Intr. fără TVA</th>
                 <th className={`${styles.th} ${styles.right}`}>TVA intr.</th>
                 <th className={`${styles.th} ${styles.right}`}>Total intr.</th>
@@ -134,6 +140,7 @@ export default function YearlySummary({ company, year, onBack }: Props) {
               {data.rows.map(r => (
                 <tr key={`${r.year}-${r.month}`} className={styles.row}>
                   <td className={`${styles.td} ${styles.left} ${styles.label}`}>{MONTHS[r.month - 1]} {r.year}</td>
+                  <td className={`${styles.td} ${styles.right} ${styles.mono} ${styles.bold}`}>{fmt(r.total_purchase)}</td>
                   <td className={`${styles.td} ${styles.right} ${styles.mono}`}>{fmt(r.total_resale_no_tax)}</td>
                   <td className={`${styles.td} ${styles.right} ${styles.mono} ${styles.muted}`}>{fmt(r.total_resale_vat)}</td>
                   <td className={`${styles.td} ${styles.right} ${styles.mono} ${styles.bold}`}>{fmt(r.total_resale)}</td>

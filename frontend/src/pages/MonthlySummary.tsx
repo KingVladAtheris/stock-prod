@@ -22,6 +22,7 @@ interface Props { company: Company; year: number; month: number; onBack: () => v
 
 const COLS: ExportColumn[] = [
   { header: 'Data', key: 'label', align: 'left' },
+  { header: 'Total cump.', key: 'tp', align: 'right' },
   { header: 'Intr. fără TVA', key: 'tp_nt', align: 'right' },
   { header: 'TVA intr.', key: 'tp_vat', align: 'right' },
   { header: 'Total intr.', key: 'tp', align: 'right' },
@@ -35,6 +36,7 @@ function TotalsRow({ label, row, prev }: { label: string; row: SummaryTotalsRow;
   return (
     <tr className={prev ? styles.prevTotalsRow : styles.periodTotalsRow}>
       <td className={`${styles.td} ${styles.totalsLabel}`}>{label}</td>
+      <td className={`${styles.td} ${styles.right} ${styles.mono} ${styles.bold}`}>{fmt(row.total_purchase)}</td>  {/* ← add */}
       <td className={`${styles.td} ${styles.right} ${styles.mono}`}>{fmt(row.resale_no_tax)}</td>
       <td className={`${styles.td} ${styles.right} ${styles.mono} ${styles.muted}`}>{fmt(row.resale_vat)}</td>
       <td className={`${styles.td} ${styles.right} ${styles.mono} ${styles.bold}`}>{fmt(row.total_resale)}</td>
@@ -62,7 +64,8 @@ export default function MonthlySummary({ company, year, month, onBack }: Props) 
 
   const exportRows: ExportRow[] = (data?.rows ?? []).map(r => ({
     label: dayLabel(r.date),
-    tp_nt: fmt(r.total_resale_no_tax), tp_vat: fmt(r.total_resale_vat), tp: fmt(r.total_resale),
+    tp: fmt(r.total_purchase),                                   // ← add
+    tp_nt: fmt(r.total_resale_no_tax), tp_vat: fmt(r.total_resale_vat), tresale: fmt(r.total_resale),
     ex_nt: fmt(r.total_exit_no_vat), ex_vat: fmt(r.total_exit_vat), ex: fmt(r.total_exit),
     stock: fmt(r.stock_total),
   }));
@@ -132,6 +135,7 @@ export default function MonthlySummary({ company, year, month, onBack }: Props) 
             <thead>
               <tr>
                 <th className={`${styles.th} ${styles.left}`}>Data</th>
+                <th className={`${styles.th} ${styles.right}`}>Total cump.</th>
                 <th className={`${styles.th} ${styles.right}`}>Intr. fără TVA</th>
                 <th className={`${styles.th} ${styles.right}`}>TVA intr.</th>
                 <th className={`${styles.th} ${styles.right}`}>Total intr.</th>
@@ -145,6 +149,7 @@ export default function MonthlySummary({ company, year, month, onBack }: Props) 
               {data.rows.map(r => (
                 <tr key={r.date} className={styles.row}>
                   <td className={`${styles.td} ${styles.left} ${styles.label}`}>{dayLabel(r.date)}</td>
+                  <td className={`${styles.td} ${styles.right} ${styles.mono} ${styles.bold}`}>{fmt(r.total_purchase)}</td>
                   <td className={`${styles.td} ${styles.right} ${styles.mono}`}>{fmt(r.total_resale_no_tax)}</td>
                   <td className={`${styles.td} ${styles.right} ${styles.mono} ${styles.muted}`}>{fmt(r.total_resale_vat)}</td>
                   <td className={`${styles.td} ${styles.right} ${styles.mono} ${styles.bold}`}>{fmt(r.total_resale)}</td>
