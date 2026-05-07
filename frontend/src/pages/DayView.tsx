@@ -12,7 +12,7 @@ import {
   createTransactionItem, updateTransactionItem, deleteTransactionItem,
   createExit, updateExit,
   createExitItem, updateExitItem, deleteExitItem,
-  BASE,
+  BASE, req,   // ← add req here
 } from '../api';
 import SellerSearch from '../components/SellerSearch';
 import ProductSearch from '../components/ProductSearch';
@@ -368,8 +368,13 @@ export default function DayView({ company, date, onBack }: Props) {
     catch(e:any){setError((e as Error).message);} finally{setSavingKey(null);}
   };
   const deleteTx = async (id: number) => {
+    const tx = report?.transactions.find(t => t.id === id);
+    if (tx && tx.items.length > 0) {
+      setError('Șterge produsele înainte de a șterge furnizorul.');
+      return;
+    }
     setSavingKey(`tx-${id}`);
-    try { await fetch(`${BASE}/companies/${company.id}/transactions/${id}`,{method:'DELETE'}); await refreshReport(); }
+    try { await req<void>(`/companies/${company.id}/transactions/${id}`, { method: 'DELETE' }); await refreshReport(); }
     catch(e:any){setError((e as Error).message);} finally{setSavingKey(null);}
   };
 
@@ -400,8 +405,13 @@ export default function DayView({ company, date, onBack }: Props) {
     catch(e:any){setError((e as Error).message);} finally{setSavingKey(null);}
   };
   const deleteEx = async (id: number) => {
+    const ex = report?.exits.find(e => e.id === id);
+    if (ex && ex.items.length > 0) {
+      setError('Șterge produsele înainte de a șterge beneficiarul.');
+      return;
+    }
     setSavingKey(`ex-${id}`);
-    try { await fetch(`${BASE}/companies/${company.id}/exits/${id}`,{method:'DELETE'}); await refreshReport(); }
+    try { await req<void>(`/companies/${company.id}/exits/${id}`, { method: 'DELETE' }); await refreshReport(); }
     catch(e:any){setError((e as Error).message);} finally{setSavingKey(null);}
   };
 
@@ -691,7 +701,12 @@ export default function DayView({ company, date, onBack }: Props) {
         <td className={`${styles.td} ${styles.center}`}>
           {canEdit&&(<div className={styles.rowActions}>
             <button className={styles.editItemBtn} onClick={()=>setTxEdits(p=>({...p,[tx.id]:txToEdit(tx,counterparties)}))} title="Editează">✎</button>
-            <button className={styles.deleteRowBtn} onClick={()=>deleteTx(tx.id)} title="Șterge">✕</button>
+            <button
+              className={styles.deleteRowBtn}
+              onClick={() => deleteTx(tx.id)}
+              title={tx.items.length > 0 ? 'Șterge produsele înainte de a șterge furnizorul' : 'Șterge'}
+              style={tx.items.length > 0 ? { opacity: 0.4, cursor: 'not-allowed' } : {}}
+            >✕</button>
           </div>)}
         </td>
       </>
@@ -763,7 +778,12 @@ export default function DayView({ company, date, onBack }: Props) {
         <td className={`${styles.td} ${styles.center}`}>
           {canEdit&&(<div className={styles.rowActions}>
             <button className={styles.editItemBtn} onClick={()=>setExEdits(p=>({...p,[ex.id]:exToEdit(ex,counterparties)}))} title="Editează">✎</button>
-            <button className={styles.deleteRowBtn} onClick={()=>deleteEx(ex.id)} title="Șterge">✕</button>
+            <button
+              className={styles.deleteRowBtn}
+              onClick={() => deleteEx(ex.id)}
+              title={ex.items.length > 0 ? 'Șterge produsele înainte de a șterge beneficiarul' : 'Șterge'}
+              style={ex.items.length > 0 ? { opacity: 0.4, cursor: 'not-allowed' } : {}}
+            >✕</button>
           </div>)}
         </td>
       </>

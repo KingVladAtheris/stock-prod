@@ -343,6 +343,71 @@ def yearly(cid: int, year: int, db: Session = Depends(get_db), user: models.User
     crud._get_company(db, cid, user.id)
     return crud.get_yearly_summary(db, cid, year)
 
+# ── Counterparty delete ────────────────────────────────────────────────────
+
+@app.delete("/counterparties/{cp_id}", status_code=204)
+def delete_counterparty(cp_id: int, db: Session = Depends(get_db), user: models.User = Depends(get_current_user)):
+    cp = db.query(models.Counterparty).filter(models.Counterparty.id == cp_id).first()
+    if not cp:
+        raise HTTPException(404, "Counterparty not found.")
+    # Check usage across all companies belonging to this user
+    user_company_ids = [c.id for c in db.query(models.Company).filter(models.Company.user_id == user.id).all()]
+    in_tx = db.query(models.Transaction).filter(
+        models.Transaction.seller_id == cp_id,
+        models.Transaction.company_id.in_(user_company_ids)
+    ).first()
+    in_ex = db.query(models.Exit).filter(
+        models.Exit.buyer_id == cp_id,
+        models.Exit.company_id.in_(user_company_ids)
+    ).first()
+    if in_tx or in_ex:
+        raise HTTPException(400, "Counterparty is in use.")
+    db.delete(cp); db.commit()
+
+@app.put("/counterparties/{cp_id}", response_model=schemas.Counterparty)
+def update_counterparty(cp_id: int, data: schemas.CounterpartyCreate,
+                        db: Session = Depends(get_db), _: models.User = Depends(get_current_user)):
+    cp = db.query(models.Counterparty).filter(models.Counterparty.id == cp_id).first()
+    if not cp:
+        raise HTTPException(404, "Counterparty not found.")
+    existing = db.query(models.Counterparty).filter(
+        models.Counterparty.tax_id == data.tax_id,
+        models.Counterparty.id != cp_id
+    ).first()
+    if existing:
+        raise HTTPException(409, "Tax ID already exists.")
+    cp.name = data.name; cp.tax_id = data.tax_id
+    db.commit(); db.refresh(cp); return cp
+
+@app.get("/companies/{cid}/counterparties-usage", response_model=List[schemas.CounterpartyUsage])
+def get_counterparties_usage(cid: int, db: Session = Depends(get_db), user: models.User = Depends(get_current_user)):
+    crud._get_company(db, cid, user.id)
+    user_companies = db.query(models.Company).filter(models.Company.user_id == user.id).all()
+    user_company_ids = [c.id for c in user_companies]
+    company_names = {c.id: c.name for c in user_companies}
+    cps = db.query(models.Counterparty).all()
+    result = []
+    for cp in cps:
+        # key: (company_name, date_iso)
+        entries = set()
+        txs = db.query(models.Transaction).filter(
+            models.Transaction.seller_id == cp.id,
+            models.Transaction.company_id.in_(user_company_ids)
+        ).all()
+        exs = db.query(models.Exit).filter(
+            models.Exit.buyer_id == cp.id,
+            models.Exit.company_id.in_(user_company_ids)
+        ).all()
+        for t in txs: entries.add((company_names[t.company_id], t.date.isoformat()))
+        for e in exs: entries.add((company_names[e.company_id], e.date.isoformat()))
+        # Sort by company name then date
+        sorted_entries = sorted(entries, key=lambda x: (x[0], x[1]))
+        used_on_dates = [f"{name}|{date}" for name, date in sorted_entries]
+        result.append(schemas.CounterpartyUsage(
+            id=cp.id, name=cp.name, tax_id=cp.tax_id,
+            used_on_dates=used_on_dates
+        ))
+    return result
 
 @app.get("/")
 def root(): return {"message": "OK"}

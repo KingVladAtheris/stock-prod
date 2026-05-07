@@ -228,3 +228,10 @@ class YearlySummaryResponse(BaseModel):
 
 class CloseLedgerRequest(BaseModel):
     closed_date: date
+
+class CounterpartyUsage(BaseModel):
+    id: int
+    name: str
+    tax_id: str
+    used_on_dates: List[str] = []
+    class Config: from_attributes = True

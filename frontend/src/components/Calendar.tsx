@@ -11,6 +11,7 @@ interface Props {
   onMonthSummary: (year: number, month: number) => void;
   onYearSummary: (year: number) => void;
   onInventory: () => void;
+  onCounterparties: () => void;
 }
 
 const MONTHS = ['Ianuarie','Februarie','Martie','Aprilie','Mai','Iunie','Iulie','August','Septembrie','Octombrie','Noiembrie','Decembrie'];
@@ -22,7 +23,7 @@ function isoDate(year: number, month: number, day: number) {
 
 type PickerMode = 'month' | 'year' | null;
 
-export default function Calendar({ company, activeDays, onDayClick, onBack, onMonthSummary, onYearSummary, onInventory }: Props) {
+export default function Calendar({ company, activeDays, onDayClick, onBack, onMonthSummary, onYearSummary, onInventory, onCounterparties }: Props) {
   const today = new Date();
   const [year,  setYear]  = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth());
@@ -107,6 +108,9 @@ export default function Calendar({ company, activeDays, onDayClick, onBack, onMo
           </button>
           <button className={styles.summaryBtn} onClick={onInventory}>
             <span className={styles.summaryBtnIcon}>📦</span> Inventar
+          </button>
+          <button className={styles.summaryBtn} onClick={onCounterparties}>
+            <span className={styles.summaryBtnIcon}>🤝</span> Terti
           </button>
         </div>
       </div>

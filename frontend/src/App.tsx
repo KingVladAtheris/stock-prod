@@ -8,9 +8,10 @@ import DayView from './pages/DayView';
 import MonthlySummary from './pages/MonthlySummary';
 import YearlySummary from './pages/YearlySummary';
 import InventoryView from './pages/InventoryView';
+import CounterpartyView from './pages/CounterpartyView';
 import './index.css';
 
-type View = 'companies' | 'calendar' | 'day' | 'monthly' | 'yearly' | 'inventory';
+type View = 'companies' | 'calendar' | 'day' | 'monthly' | 'yearly' | 'inventory' | 'counterparties';
 
 export default function App() {
   // Auth gate — token presence is the source of truth
@@ -69,6 +70,7 @@ export default function App() {
       onMonthSummary={(y, m) => { setSummaryYear(y); setSummaryMonth(m); setView('monthly'); }}
       onYearSummary={y => { setSummaryYear(y); setView('yearly'); }}
       onInventory={() => setView('inventory')}
+      onCounterparties={() => setView('counterparties')}
     />
   );
 
@@ -86,6 +88,10 @@ export default function App() {
 
   if (view === 'inventory' && company) return (
     <InventoryView company={company} onBack={backToCalendar} />
+  );
+
+  if (view === 'counterparties' && company) return (
+    <CounterpartyView company={company} onBack={backToCalendar} />
   );
 
   return null;

@@ -24,9 +24,20 @@ export function clearToken(): void {
   localStorage.removeItem(TOKEN_KEY);
 }
 
+export interface CounterpartyUsage {
+  id: number; name: string; tax_id: string; used_on_dates: string[];
+}
+
+export const getCounterpartiesUsage = (cid: number) =>
+  req<CounterpartyUsage[]>(`/companies/${cid}/counterparties-usage`);
+export const updateCounterparty = (cpId: number, d: CounterpartyCreate) =>
+  req<Counterparty>(`/counterparties/${cpId}`, { method: 'PUT', body: JSON.stringify(d) });
+export const deleteCounterparty = (cpId: number) =>
+  req<void>(`/counterparties/${cpId}`, { method: 'DELETE' });
+
 // ── Core fetch wrapper ─────────────────────────────────────────────────────
 
-async function req<T>(path: string, options: RequestInit = {}): Promise<T> {
+export async function req<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = getToken();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -144,3 +155,4 @@ export const getMonthlySummary = (cid: number, year: number, month: number) =>
   req<MonthlySummaryResponse>(`/companies/${cid}/summary/month/${year}/${month}`);
 export const getYearlySummary = (cid: number, year: number) =>
   req<YearlySummaryResponse>(`/companies/${cid}/summary/year/${year}`);
+
