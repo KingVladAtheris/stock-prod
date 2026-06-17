@@ -298,12 +298,18 @@ def _stock_before(db: Session, company_id: int, before_date: date, op_nv: Decima
         models.Exit.date < before_date,
     ).group_by(models.Exit.date).all()
 
+    tx_dict   = {r.date: r for r in tx_dates}
     exit_dict = {r.date: r for r in exit_dates}
+
+    # Union of all dates that have either an entry or an exit
+    all_dates = sorted(set(tx_dict.keys()) | set(exit_dict.keys()))
+
     nv, vat, total = op_nv, op_vat, op_tot
-    for row in sorted(tx_dates, key=lambda r: r.date):
-        ed = exit_dict.get(row.date)
-        dnv = row.rnt - (ed.nv  if ed else D0)
-        dv  = row.rv  - (ed.vat if ed else D0)
+    for d in all_dates:
+        tx = tx_dict.get(d)
+        ex = exit_dict.get(d)
+        dnv = (tx.rnt if tx else D0) - (ex.nv  if ex else D0)
+        dv  = (tx.rv  if tx else D0) - (ex.vat if ex else D0)
         nv += dnv; vat += dv; total = nv + vat
     return nv, vat, total
 
